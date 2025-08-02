@@ -6,4 +6,5 @@ interface Settings {
   cohesionWeight: number;
   alignmentWeight: number;
   separationWeight: number;
+  randomness: number;
 }

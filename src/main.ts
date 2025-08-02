@@ -15,6 +15,7 @@ const settings: Settings = {
   cohesionWeight: 0.05,
   alignmentWeight: 0.1,
   separationWeight: 0.15,
+  randomness: 0.05,
 };
 
 const flock = new Flock(canvas, 100, settings);

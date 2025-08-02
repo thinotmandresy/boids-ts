@@ -25,7 +25,13 @@ export default class Boid {
     this.maxForce = maxForce;
   }
 
-  update() {
+  update(settings: Settings) {
+    const randomForce = {
+      x: (Math.random() * 2 - 1) * settings.randomness,
+      y: (Math.random() * 2 - 1) * settings.randomness,
+    };
+    this.applyForce(randomForce);
+
     this.velocity.x += this.acceleration.x;
     this.velocity.y += this.acceleration.y;
 

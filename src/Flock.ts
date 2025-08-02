@@ -7,6 +7,7 @@ export default class Flock {
   cohesionWeight: number;
   alignmentWeight: number;
   separationWeight: number;
+  randomness: number;
 
   constructor(canvas: HTMLCanvasElement, count: number, settings: Settings) {
     this.boids = Array.from(
@@ -18,12 +19,22 @@ export default class Flock {
     this.cohesionWeight = settings.cohesionWeight;
     this.alignmentWeight = settings.alignmentWeight;
     this.separationWeight = settings.separationWeight;
+    this.randomness = settings.randomness;
   }
 
   update(canvas: HTMLCanvasElement) {
     for (const boid of this.boids) {
       this.flock(boid);
-      boid.update();
+      boid.update({
+        maxSpeed: this.boids[0].maxSpeed, // max speed is the same for all boids
+        maxForce: this.boids[0].maxForce,
+        perceptionRadius: this.perceptionRadius,
+        separationDistance: this.separationDistance,
+        cohesionWeight: this.cohesionWeight,
+        alignmentWeight: this.alignmentWeight,
+        separationWeight: this.separationWeight,
+        randomness: this.randomness,
+      });
       boid.wrapAround(canvas);
     }
   }
