@@ -55,7 +55,7 @@ export default class Flock {
         if (distance < this.separationDistance) {
           const diff = {
             x: -dx / (distance + 0.01),
-            y: -dx / (distance + 0.01)
+            y: -dy / (distance + 0.01)
           };
           separation.x += diff.x;
           separation.y += diff.y;
