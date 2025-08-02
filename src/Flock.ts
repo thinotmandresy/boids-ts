@@ -149,16 +149,19 @@ export default class Flock {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = "#ffffff";
     for (const boid of this.boids) {
+      const speed = Math.sqrt(boid.velocity.x ** 2 + boid.velocity.y ** 2);
+      const hue = Math.min((speed / boid.maxSpeed) * 180, 180); // speed<->hue
+      ctx.fillStyle = `hsl(${ hue }, 100%, 60%)`;
+
       const angle = Math.atan2(boid.velocity.y, boid.velocity.x);
       ctx.save();
       ctx.translate(boid.position.x, boid.position.y);
       ctx.rotate(angle);
       ctx.beginPath();
-      ctx.moveTo(10, 0);
-      ctx.lineTo(-6, 4);
-      ctx.lineTo(-6, -4);
+      ctx.moveTo(7, 0);
+      ctx.lineTo(-5, 4);
+      ctx.lineTo(-5, -4);
       ctx.closePath();
       ctx.fill();
       ctx.restore();
