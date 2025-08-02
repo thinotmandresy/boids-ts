@@ -2,44 +2,21 @@ import Boid from "./Boid";
 
 export default class Flock {
   boids: Boid[];
-  perceptionRadius: number;
-  separationDistance: number;
-  cohesionWeight: number;
-  alignmentWeight: number;
-  separationWeight: number;
-  randomness: number;
+  settings: Settings;
 
   constructor(canvas: HTMLCanvasElement, count: number, settings: Settings) {
     this.boids = Array.from(
       { length: count }, 
       () => new Boid(canvas, settings.maxSpeed, settings.maxForce)
     );
-    this.perceptionRadius = settings.perceptionRadius;
-    this.separationDistance = settings.separationDistance;
-    this.cohesionWeight = settings.cohesionWeight;
-    this.alignmentWeight = settings.alignmentWeight;
-    this.separationWeight = settings.separationWeight;
-    this.randomness = settings.randomness;
+    this.settings = { ...settings };
   }
 
-  update(canvas: HTMLCanvasElement, wrapAround: boolean) {
+  update(canvas: HTMLCanvasElement, boundaryHandler: (boid: Boid, canvas: HTMLCanvasElement) => void) {
     for (const boid of this.boids) {
       this.flock(boid);
-      boid.update({
-        maxSpeed: this.boids[0].maxSpeed, // max speed is the same for all boids
-        maxForce: this.boids[0].maxForce,
-        perceptionRadius: this.perceptionRadius,
-        separationDistance: this.separationDistance,
-        cohesionWeight: this.cohesionWeight,
-        alignmentWeight: this.alignmentWeight,
-        separationWeight: this.separationWeight,
-        randomness: this.randomness,
-      });
-      if (wrapAround) {
-        boid.wrapAround(canvas);
-      } else {
-        boid.bounceOffEdges(canvas);
-      }
+      boid.update(this.settings);
+      boundaryHandler(boid, canvas);
     }
   }
 
@@ -58,7 +35,7 @@ export default class Flock {
       const dy = neighbor.position.y - boid.position.y;
       const distance = Math.sqrt(dx ** 2 + dy ** 2);
 
-      if (distance < this.perceptionRadius) {
+      if (distance < this.settings.perceptionRadius) {
         cohesion.x += neighbor.position.x;
         cohesion.y += neighbor.position.y;
         cohesionCount++;
@@ -67,7 +44,7 @@ export default class Flock {
         alignment.y += neighbor.velocity.y;
         alignmentCount++;
 
-        if (distance < this.separationDistance) {
+        if (distance < this.settings.separationDistance) {
           const diff = {
             x: -dx / (distance + 0.01),
             y: -dy / (distance + 0.01)
@@ -97,8 +74,8 @@ export default class Flock {
         }
 
         boid.applyForce({
-          x: cohesion.x * this.cohesionWeight,
-          y: cohesion.y * this.cohesionWeight
+          x: cohesion.x * this.settings.cohesionWeight,
+          y: cohesion.y * this.settings.cohesionWeight
         });
       }
     }
@@ -119,9 +96,9 @@ export default class Flock {
         }
 
         boid.applyForce({
-          x: alignment.x * this.alignmentWeight,
-          y: alignment.y * this.alignmentWeight,
-        })
+          x: alignment.x * this.settings.alignmentWeight,
+          y: alignment.y * this.settings.alignmentWeight,
+        });
       }
     }
 
@@ -141,30 +118,10 @@ export default class Flock {
         }
 
         boid.applyForce({
-          x: separation.x * this.separationWeight,
-          y: separation.y * this.separationWeight,
-        })
+          x: separation.x * this.settings.separationWeight,
+          y: separation.y * this.settings.separationWeight,
+        });
       }
-    }
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    for (const boid of this.boids) {
-      const speed = Math.sqrt(boid.velocity.x ** 2 + boid.velocity.y ** 2);
-      const hue = Math.min((speed / boid.maxSpeed) * 180, 180); // speed<->hue
-      ctx.fillStyle = `hsl(${ hue }, 100%, 60%)`;
-
-      const angle = Math.atan2(boid.velocity.y, boid.velocity.x);
-      ctx.save();
-      ctx.translate(boid.position.x, boid.position.y);
-      ctx.rotate(angle);
-      ctx.beginPath();
-      ctx.moveTo(7, 0);
-      ctx.lineTo(-5, 4);
-      ctx.lineTo(-5, -4);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
     }
   }
 }

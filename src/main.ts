@@ -1,5 +1,7 @@
 import Flock from "./Flock";
+import Renderer from "./Renderer";
 import "./style.css";
+import { wrapAround } from "./utils/boundary-handlers";
 
 const canvas = document.querySelector<HTMLCanvasElement>("canvas#boids")!;
 const ctx = canvas.getContext("2d")!;
@@ -19,11 +21,12 @@ const settings: Settings = {
 };
 
 const flock = new Flock(canvas, 100, settings);
+const renderer = new Renderer(ctx);
 
 (function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  flock.update(canvas);
-  flock.draw(ctx);
+  const boundaryHandler = wrapAround;
+  flock.update(canvas, boundaryHandler);
+  renderer.draw(flock.boids);
   requestAnimationFrame(animate);
 })();
 
