@@ -62,4 +62,24 @@ export default class Boid {
     if (this.position.y < 0) this.position.y += canvas.height;
     if (this.position.y > canvas.height) this.position.y -= canvas.height;
   }
+
+  bounceOffEdges(canvas: HTMLCanvasElement) {
+    if (this.position.x < 0) {
+      this.position.x = 0;
+      this.velocity.x = -this.velocity.x;
+    }
+    if (this.position.x > canvas.width) {
+      this.position.x = canvas.width;
+      this.velocity.x = -this.velocity.x;
+    }
+
+    if (this.position.y < 0) {
+      this.position.y = 0;
+      this.velocity.y = -this.velocity.y;
+    }
+    if (this.position.y > canvas.height) {
+      this.position.y = canvas.height;
+      this.velocity.y = -this.velocity.y;
+    }
+  }
 }

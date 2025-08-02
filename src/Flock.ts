@@ -22,7 +22,7 @@ export default class Flock {
     this.randomness = settings.randomness;
   }
 
-  update(canvas: HTMLCanvasElement) {
+  update(canvas: HTMLCanvasElement, wrapAround: boolean) {
     for (const boid of this.boids) {
       this.flock(boid);
       boid.update({
@@ -35,7 +35,11 @@ export default class Flock {
         separationWeight: this.separationWeight,
         randomness: this.randomness,
       });
-      boid.wrapAround(canvas);
+      if (wrapAround) {
+        boid.wrapAround(canvas);
+      } else {
+        boid.bounceOffEdges(canvas);
+      }
     }
   }
 
