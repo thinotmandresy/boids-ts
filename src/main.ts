@@ -1,7 +1,8 @@
 import Flock from "./Flock";
 import Renderer from "./Renderer";
 import "./style.css";
-import { wrapAround } from "./utils/boundary-handlers";
+import UIController from "./UIController";
+import { wrapAround, bounceOffEdges } from "./utils/boundary-handlers";
 
 const canvas = document.querySelector<HTMLCanvasElement>("canvas#boids")!;
 const ctx = canvas.getContext("2d")!;
@@ -22,9 +23,10 @@ const settings: Settings = {
 
 const flock = new Flock(canvas, 100, settings);
 const renderer = new Renderer(ctx);
+const uiController = new UIController(flock, settings);
 
 (function animate() {
-  const boundaryHandler = wrapAround;
+  const boundaryHandler = uiController.wrapAround ? wrapAround : bounceOffEdges;
   flock.update(canvas, boundaryHandler);
   renderer.draw(flock.boids);
   requestAnimationFrame(animate);
