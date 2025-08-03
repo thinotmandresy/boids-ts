@@ -37,3 +37,7 @@ canvas {
 .controls input[type="checkbox"] {
   margin-left: 5px;
 }
+
+.fps-counter {
+  color: #33ff6c;
+}

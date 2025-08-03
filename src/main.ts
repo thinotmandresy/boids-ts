@@ -1,4 +1,5 @@
 import Flock from "./Flock";
+import FPSCounter from "./FPSCounter";
 import Renderer from "./Renderer";
 import "./style.css";
 import UIController from "./UIController";
@@ -24,8 +25,10 @@ const settings: Settings = {
 const flock = new Flock(canvas, 1000, settings);
 const renderer = new Renderer(ctx);
 const uiController = new UIController(flock, settings);
+const fpsCounter = new FPSCounter("fpsCounter");
 
 (function animate() {
+  fpsCounter.update();
   const boundaryHandler = uiController.wrapAround ? wrapAround : bounceOffEdges;
   flock.update(canvas, boundaryHandler);
   renderer.draw(flock.boids);
