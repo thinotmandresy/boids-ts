@@ -1,8 +1,10 @@
 import Boid from "./Boid";
+import QuadTree from "./QuadTree";
 
 export default class Flock {
   boids: Boid[];
   settings: Settings;
+  private readonly BOIDS_PER_LEAF = 4;
 
   constructor(canvas: HTMLCanvasElement, count: number, settings: Settings) {
     this.boids = Array.from(
@@ -13,14 +15,31 @@ export default class Flock {
   }
 
   update(canvas: HTMLCanvasElement, boundaryHandler: (boid: Boid, canvas: HTMLCanvasElement) => void) {
+    const quadTree = new QuadTree(
+      { x: 0, y: 0, width: canvas.width, height: canvas.height },
+      this.BOIDS_PER_LEAF
+    );
+
     for (const boid of this.boids) {
-      this.flock(boid);
+      quadTree.insert({ x: boid.position.x, y: boid.position.y, boid });
+    }
+
+    for (const boid of this.boids) {
+      this.flock(boid, quadTree);
       boid.update(this.settings);
       boundaryHandler(boid, canvas);
     }
   }
 
-  flock(boid: Boid) {
+  flock(boid: Boid, quadTree: QuadTree) {
+    const range = {
+      x: boid.position.x - this.settings.perceptionRadius,
+      y: boid.position.y - this.settings.perceptionRadius,
+      width: this.settings.perceptionRadius * 2,
+      height: this.settings.perceptionRadius * 2,
+    };
+    const neighbors = quadTree.query(range);
+
     const cohesion = { x: 0, y: 0 };
     const alignment = { x: 0, y: 0 };
     const separation = { x: 0, y: 0 };
@@ -28,20 +47,20 @@ export default class Flock {
     let alignmentCount = 0;
     let separationCount = 0;
 
-    for (const neighbor of this.boids) {
-      if (neighbor === boid) continue;
+    for (const neighbor of neighbors) {
+      if (neighbor.boid === boid) continue;
 
-      const dx = neighbor.position.x - boid.position.x;
-      const dy = neighbor.position.y - boid.position.y;
+      const dx = neighbor.x - boid.position.x;
+      const dy = neighbor.y - boid.position.y;
       const distance = Math.sqrt(dx ** 2 + dy ** 2);
 
       if (distance < this.settings.perceptionRadius) {
-        cohesion.x += neighbor.position.x;
-        cohesion.y += neighbor.position.y;
+        cohesion.x += neighbor.x;
+        cohesion.y += neighbor.y;
         cohesionCount++;
         
-        alignment.x += neighbor.velocity.x;
-        alignment.y += neighbor.velocity.y;
+        alignment.x += neighbor.boid.velocity.x;
+        alignment.y += neighbor.boid.velocity.y;
         alignmentCount++;
 
         if (distance < this.settings.separationDistance) {
