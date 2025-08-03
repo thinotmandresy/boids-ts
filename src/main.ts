@@ -21,7 +21,7 @@ const settings: Settings = {
   randomness: 0.05,
 };
 
-const flock = new Flock(canvas, 100, settings);
+const flock = new Flock(canvas, 1000, settings);
 const renderer = new Renderer(ctx);
 const uiController = new UIController(flock, settings);
 
